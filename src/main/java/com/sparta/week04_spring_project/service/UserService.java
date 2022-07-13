@@ -26,29 +26,19 @@ public class UserService {
     public void registerUser(SignupRequestDto requestDto) {
         // 회원 ID 중복 확인
         String username = requestDto.getUsername();
+        Pattern pattern = Pattern.compile("^[a-zA-Z0-9]{3,}$");
+        Pattern patternPass = Pattern.compile("^[a-zA-Z0-9]{4,}$");
         Optional<User> found = userRepository.findByUsername(username);
+
         if (found.isPresent()) {
             throw new IllegalArgumentException("중복된 사용자 ID 가 존재합니다.");
-        }
-
-        //닉네임 정규표현식
-        Pattern pattern = Pattern.compile("^[a-zA-Z0-9]{3,}$");
-        if (!pattern.matcher(requestDto.getUsername()).matches()){
+        }else if (!pattern.matcher(requestDto.getUsername()).matches()){//닉네임 정규표현식
             throw new IllegalArgumentException("최소 3자 이상, 영문 숫자만 가능합니다.");
-        }
-
-        Pattern patternPass = Pattern.compile("^[a-zA-Z0-9]{4,}$");
-        if (!patternPass.matcher(requestDto.getPassword()).matches()){
+        }else if (!patternPass.matcher(requestDto.getPassword()).matches()){
             throw new IllegalArgumentException("최소 4자 이상");
-        }
-
-        //비밀번호에 아이디 포함 확인
-        if(requestDto.getPassword().contains(requestDto.getUsername())){
+        }else if(requestDto.getPassword().contains(requestDto.getUsername())){//비밀번호에 아이디 포함 확인
             throw new IllegalArgumentException("비밀번호에 ID를 포함할 수 없습니다.");
-        }
-
-        //비밀번호 불일치
-        if (!requestDto.getPassword().equals(requestDto.getPasswordCheck())){
+        }else if (!requestDto.getPassword().equals(requestDto.getPasswordCheck())){//비밀번호 불일치
             throw new IllegalArgumentException("비밀번호 불일치");
         }
 

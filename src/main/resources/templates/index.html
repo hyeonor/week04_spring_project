@@ -423,6 +423,9 @@
                                 </div>
                                 <!-- 버튼 영역-->
                                 <div class="footer">
+                                    <div class="countReply" style="margin-left: 20px; margin-top: 40px">
+                                        댓글 : 0
+                                    </div>
                                     <img id="${id}-edit" class="icon-start-edit" src="images/edit.png" alt="" onclick="editPost('${id}')">
                                     <img id="${id}-delete" class="icon-delete" src="images/delete.png" alt="" onclick="deleteOne('${id}')">
                                     <img id="${id}-submit" class="icon-end-edit" src="images/done.png" alt="" onclick="submitEdit('${id}')">
@@ -436,7 +439,7 @@
         function writePost() {
             // 1. 작성한 제목, 작성자명, 비밀번호 작성 메모를 불러옵니다.
             let title = $('#title').val();
-            let username = $('#name').val();
+            let username = "[[${username}]]";
             let password = $('#password').val();
             let contents = $('#contents').val();
             // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
@@ -454,37 +457,6 @@
                 success: function (response) {
                     alert('메시지가 성공적으로 작성되었습니다.');
                     window.location.reload();
-                }
-            });
-        }
-
-
-        // 댓글을 작성하고 post 요청을 보내 저장합니다.
-        function writeReply() {
-            let postid = location.href.split("id=")[1];
-            let reply = $('#reply').val();
-            if (isValidContents(reply) == false) {
-                return;
-            }
-
-            let data = {'postid': postid, 'reply': reply};
-            $.ajax({
-                type: "POST",
-                url: "/api/reply",
-                contentType: "application/json",
-                data: JSON.stringify(data),
-                success: function (response) {
-                    if (response == true) {
-                        alert('메시지가 성공적으로 작성되었습니다.');
-                        window.location.reload();
-                    } else {
-                        alert('로그인을 해주세요>_<');
-                        window.location.replace("/user/login");
-                    }
-                },
-                error: function (xhr, ajaxOptions, thrownError) {
-                    alert('로그인을 해주세요>_<');
-                    window.location.replace("/user/login");
                 }
             });
         }
@@ -550,15 +522,14 @@
             공유하고 싶은 소식을 입력해주세요.
             24시간이 지난 뒤에는 사라집니다.
         </p>
+        <div id="header-title-login-user">
+
+        </div>
         <form id="my_form" method="post" action="/user/logout">
             <a id="logout-text" href="javascript:{}" onclick="document.getElementById('my_form').submit();">로그아웃</a>
         </form>
     </div>
     <div class="id-password-box" style="display: flex">
-        <div >
-                <textarea class="namefield" placeholder="작성자명" name="name" id="name" cols="30"
-                          rows="10"></textarea>
-        </div>
         <div class="">
                 <textarea class="passwordfield" placeholder="비밀번호" name="password" id="password" cols="30"
                           rows="10"></textarea>
@@ -602,9 +573,9 @@
             </div>
             <!-- 버튼 영역-->
             <div class="footer">
-                <img id="1-edit" onclick="editPost('1')" class="icon-start-edit" src="../static/images/edit.png" alt="">
-                <img id="1-delete" onclick="deleteOne('1')" class="icon-delete" src="../static/images/delete.png" alt="">
-                <img id="1-submit" onclick="submitEdit('1')" class="icon-end-edit" src="../static/images/done.png" alt="">
+                <img id="1-edit" onclick="editPost('1')" class="icon-start-edit" src="images/edit.png" alt="">
+                <img id="1-delete" onclick="deleteOne('1')" class="icon-delete" src="images/delete.png" alt="">
+                <img id="1-submit" onclick="submitEdit('1')" class="icon-end-edit" src="images/done.png" alt="">
             </div>
         </div>
     </div>

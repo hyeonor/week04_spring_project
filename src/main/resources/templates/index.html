@@ -346,11 +346,13 @@
         }
 
         function showEdits(id) {
-            $(`#${id}-passwordarea`).show();
+            // $(`#${id}-passwordarea`).show();
             $(`#${id}-editarea`).show();
             $(`#${id}-submit`).show();
             $(`#${id}-delete`).show();
 
+            $('#write-contents-box').hide();
+            $('#write-box').hide();
             $(`#${id}-contents`).hide();
             $(`#${id}-edit`).hide();
         }
@@ -417,9 +419,6 @@
                                     <div id="${id}-editarea" class="edit">
                                         <textarea id="${id}-textarea" class="te-edit" name="" id="" cols="30" rows="5"></textarea>
                                     </div>
-                                    <div id="${id}-passwordarea" class="edit">
-                                        <textarea id="${id}-passwordtextarea" class="password-te-edit" placeholder="비밀번호 입력해주세요" name="passwordcheck" id="passwordcheck" cols="30" rows="5"></textarea>
-                                    </div>
                                 </div>
                                 <!-- 버튼 영역-->
                                 <div class="footer">
@@ -439,15 +438,14 @@
         function writePost() {
             // 1. 작성한 제목, 작성자명, 비밀번호 작성 메모를 불러옵니다.
             let title = $('#title').val();
-            let username = "[[${username}]]";
-            let password = $('#password').val();
+            //let password = $('#password').val();
             let contents = $('#contents').val();
             // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
             if (isValidContents(contents) == false) {
                 return;
             }
             // 3. 전달할 data JSON으로 만듭니다.
-            let data = {'title': title, 'username': username, 'contents': contents, 'password': password};
+            let data = {'title': title, 'contents': contents};
             // 4. POST /api/memos 에 data를 전달합니다.
             $.ajax({
                 type: "POST",
@@ -466,13 +464,12 @@
             // 1. 작성 대상 메모의 username과 contents 를 확인합니다.
             let username = $(`#${id}-username`).text().trim();
             let contents = $(`#${id}-textarea`).val().trim();
-            let password = $(`#${id}-passwordtextarea`).val().trim();
             // 2. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
             if (isValidContents(contents) == false) {
                 return;
             }
             // 3. 전달할 data JSON으로 만듭니다.
-            let data = {'username': username, 'contents': contents,'password': password};
+            let data = {'username': username, 'contents': contents};
             // 4. PUT /api/memos/{id} 에 data를 전달합니다.
             $.ajax({
                 type: "PUT",
@@ -488,15 +485,9 @@
 
         // 메모를 삭제합니다.
         function deleteOne(id) {
-            let password = $(`#${id}-passwordtextarea`).val().trim();//*추가*
-            // 1. 전달할 data JSON으로 만듭니다.
-            let data = {'password': password};//*추가*
-            // 2. DELETE /api/memos/{id} 에 요청해서 메모를 삭제합니다.
             $.ajax({
                 type: "DELETE",
                 url: `/api/memos/${id}`,
-                contentType: "application/json",//*추가*
-                data: JSON.stringify(data),//*추가*
                 success: function (response) {
                     alert(response);
                     window.location.reload();
@@ -516,6 +507,12 @@
 
 </div>
 <div class="wrap">
+    <form id="formLogin" action="/user/login">
+        <a onclick="document.getElementById('formLogin').submit();">로그인</a>
+    </form>
+    <form id="my_form" method="post" action="/user/logout" style="text-align: right">
+        <a id="logout-text" href="javascript:{}" onclick="document.getElementById('my_form').submit();">로그아웃</a>
+    </form>
     <div class="header">
         <h2><span th:text="${username}"></span> 님의 Timeline Service</h2>
         <p>
@@ -525,21 +522,19 @@
         <div id="header-title-login-user">
 
         </div>
-        <form id="my_form" method="post" action="/user/logout">
-            <a id="logout-text" href="javascript:{}" onclick="document.getElementById('my_form').submit();">로그아웃</a>
-        </form>
+
     </div>
-    <div class="id-password-box" style="display: flex">
-        <div class="">
-                <textarea class="passwordfield" placeholder="비밀번호" name="password" id="password" cols="30"
-                          rows="10"></textarea>
-        </div>
-    </div>
-    <div class="area-write">
+<!--    <div class="id-password-box" style="display: flex">-->
+<!--        <div class="">-->
+<!--                <textarea class="passwordfield" placeholder="비밀번호" name="password" id="password" cols="30"-->
+<!--                          rows="10"></textarea>-->
+<!--        </div>-->
+<!--    </div>-->
+    <div class="area-write" id="write-box">
             <textarea class="titlefiled" placeholder="제목을 입력해주세요" name="title" id="title" cols="30"
                       rows="10"></textarea>
     </div>
-    <div class="area-write">
+    <div class="area-write" id="write-contents-box">
             <textarea class="field" placeholder="공유하고 싶은 소식을 입력해주세요" name="contents" id="contents" cols="30"
                       rows="10"></textarea>
         <!--            <button class="btn btn-danger" onclick="writePost()">작성하기</button>-->

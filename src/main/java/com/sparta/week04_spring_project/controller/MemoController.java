@@ -3,8 +3,10 @@ package com.sparta.week04_spring_project.controller;
 import com.sparta.week04_spring_project.model.Memo;
 import com.sparta.week04_spring_project.repository.MemoRepository;
 import com.sparta.week04_spring_project.dto.MemoRequestDto;
+import com.sparta.week04_spring_project.security.UserDetailsImpl;
 import com.sparta.week04_spring_project.service.MemoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -18,8 +20,11 @@ public class MemoController {
     private final MemoService memoService;
 
     @PostMapping("/api/memos")
-    public Memo createMemo(@RequestBody MemoRequestDto requestDto) {
-        Memo memo = new Memo(requestDto);
+    public Memo createMemo(@RequestBody MemoRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        if(userDetails.getUser().getId() == null) {
+            throw new IllegalArgumentException("로그인 한 회원만 작성할 수 있습니다.");
+        }
+        Memo memo = new Memo(requestDto, userDetails.getUsername());
         return memoRepository.save(memo);
     }
 
@@ -28,32 +33,16 @@ public class MemoController {
         LocalDateTime start = LocalDateTime.now().minusDays(1);//하루전
         LocalDateTime end = LocalDateTime.now();//지금
         return memoRepository.findAllByModifiedAtBetweenOrderByModifiedAtDesc(start, end);
-        //return memoRepository.findAllByOrderByModifiedAtDesc();
     }
 
-//    //기존
-//    @DeleteMapping("/api/memos/{id}")
-//    public Long deleteMemo(@PathVariable Long id) {
-//        memoRepository.deleteById(id);
-//        return id;
-//    }
-
     @DeleteMapping("/api/memos/{id}")
-    public String deleteMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
-        Memo memo = memoRepository.findById(id).get();
-        if(memo.getPassword().equals(requestDto.getPassword())) {
-            memoRepository.deleteById(id);
-            return "삭제 완료";
-        }
-        else {
-            return "비밀번호 불일치";
-        }
+    public String deleteMemo(@PathVariable Long id) {
+        memoRepository.deleteById(id);
+        return "삭제 완료";
     }
 
     @PutMapping("/api/memos/{id}")
     public String updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto requestDto) {
-        String result;
-        result = memoService.update(id, requestDto);
-        return result;
+        return memoService.update(id, requestDto);
     }
 }
